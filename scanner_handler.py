@@ -41,4 +41,5 @@ class CheckQr:
 
     @staticmethod
     def send_error(error: str):
+        print("\nsend_error(): ", error)
         return error
