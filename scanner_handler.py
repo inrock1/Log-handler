@@ -1,4 +1,3 @@
-
 class CheckQr:
     def __init__(self):
         self.color = None
@@ -8,24 +7,19 @@ class CheckQr:
         raise ConnectionError
 
     def check_len_color(self, qr):
-        color = {
-            3: 'Red',
-            5: 'Green',
-            7: 'Fuzzy Wuzzy'
-        }
+        color = {3: "Red", 5: "Green", 7: "Fuzzy Wuzzy"}
         self.color = color.get(len(qr))
         return self.color
 
     def scan_check_out_list(self, qr):
         return [
-            self.check_out(not self.check_len_color(qr), lambda: [
-                self.send_error(f"Error: Wrong qr length {len(qr)}")
-            ]
-                     ),
-            self.check_out(not self.check_in_db(qr), lambda: [
-                self.send_error("Not in DB")
-            ]
-                     )
+            self.check_out(
+                not self.check_len_color(qr),
+                lambda: [self.send_error(f"Error: Wrong qr length {len(qr)}")],
+            ),
+            self.check_out(
+                not self.check_in_db(qr), lambda: [self.send_error("Not in DB")]
+            ),
         ]
 
     def check_scanned_device(self, qr: str):
@@ -41,5 +35,4 @@ class CheckQr:
 
     @staticmethod
     def send_error(error: str):
-        print("\nsend_error(): ", error)
         return error
