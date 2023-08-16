@@ -1,3 +1,6 @@
+from collections import defaultdict
+
+
 def read_log_file(filename):
     with open(filename, "r") as log_file:
         for line in log_file:
@@ -22,7 +25,12 @@ def get_name_error(s_p_1: str, s_p_2: str):
     return f"{step3} Unknown device error"
 
 
-def print_results(sensor_success_count, total_success_count, total_fail_count, errors):
+def print_results(
+        sensor_success_count: dict,
+        total_success_count: int,
+        total_fail_count: int,
+        errors: dict
+):
     print("All big messages:", total_success_count + total_fail_count)
     print("Successful big messages:", total_success_count)
     print("Failed big messages:", total_fail_count)
@@ -37,9 +45,9 @@ def print_results(sensor_success_count, total_success_count, total_fail_count, e
         print(f"{sensor_id}: {success_count}")
 
 
-def calculate_results(log_file_path):
-    sensor_success_count = {}
-    sensor_fail = set()
+def process_log(log_file_path: str):
+    sensor_success_count = defaultdict(int)
+    sensor_fail = defaultdict(int)
     errors = {}
 
     for line in read_log_file(log_file_path):
@@ -51,13 +59,14 @@ def calculate_results(log_file_path):
             s_p_2 = parts[13]
             state = parts[-2]
 
-            if state == "02" and sensor_id not in sensor_fail:
-                count = sensor_success_count.get(sensor_id, 0)
-                count += 1
-                sensor_success_count[sensor_id] = count
+            if state == "02":
+                if sensor_id not in sensor_fail:
+                    count = sensor_success_count[sensor_id]
+                    count += 1
+                    sensor_success_count[sensor_id] = count
 
             elif state == "DD":
-                sensor_fail.add(sensor_id)
+                _ = sensor_fail[sensor_id]
                 sensor_success_count.pop(sensor_id, None)
                 errors[sensor_id] = get_name_error(s_p_1, s_p_2)
 
@@ -69,7 +78,7 @@ def calculate_results(log_file_path):
     print_results(sensor_success_count, total_success_count, total_fail_count, errors)
 
 
-calculate_results("app_2.log")
+process_log("app_2.log")
 
 
 """
